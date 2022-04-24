@@ -76,6 +76,7 @@
                 // return float4(i.posScreen.xyz, 1.0);
                 // return float4(tsmTapPosScreen.xyz, 1.0);
                 // return float4(tsmTap.x, tsmTap.y, tsmTap.z, 1.0);
+                // return float4(tsmTapPosClip);
                 // return float4(posLightNdc_xy, 0.0, 1.0);
                 // return float4(i.posWorld, 1.0);
                 // return float4(posLightClip);

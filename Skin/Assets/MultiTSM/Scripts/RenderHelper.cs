@@ -9,7 +9,7 @@ public class RenderHelper : MonoBehaviour
     public Material depthMaterial;
     public Material errorRateMaterial;
 
-    public Camera virtualViewCamera;
+    public Camera virtualCamera;
     public int textureSize = 512;
     
     public Light tsmLight;
@@ -27,6 +27,8 @@ public class RenderHelper : MonoBehaviour
         tsmIrradianceTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
         virtualViewDepthTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.Depth);
         errorRateTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
+        errorRateTexture.autoGenerateMips = true;
+        errorRateTexture.useMipMap = true;
         
         InitializeTsmLight();
         
@@ -54,11 +56,18 @@ public class RenderHelper : MonoBehaviour
     void SetUniforms()
     {
         Shader.SetGlobalTexture("_VirtualViewDepthTex", virtualViewDepthTexture);
-        Shader.SetGlobalFloat("_ErrorTestCountPerFrag", errorTestCountPerFrag);
         Shader.SetGlobalTexture("_TsmTex", tsmTexture);
         Shader.SetGlobalTexture("_TsmIrradianceTex", tsmIrradianceTexture);
-        Matrix4x4 worldToLightViewProjMatrix = tsmLightScript.GetWorldToLightViewProjMatrix();
-        Shader.SetGlobalMatrix("_WorldToLight_VP", worldToLightViewProjMatrix);
+        Shader.SetGlobalTexture("_ErrorRateTex", errorRateTexture);
+        Shader.SetGlobalFloat("_ErrorTestCountPerFrag", errorTestCountPerFrag);
+        Shader.SetGlobalMatrix("_WorldToLight_VP", tsmLightScript.GetWorldToLightViewProjMatrix());
+
+        Matrix4x4 worldToVirtCamViewMatrix = virtualCamera.worldToCameraMatrix;
+        Matrix4x4 virtCamProj = GL.GetGPUProjectionMatrix(virtualCamera.projectionMatrix, true);
+        Matrix4x4 worldToVirtCamViewProjMatrix = virtCamProj * worldToVirtCamViewMatrix;
+        Shader.SetGlobalMatrix("_WorldToVirtualCam_VP", worldToVirtCamViewProjMatrix);
+        
+        Shader.SetGlobalVector("_TsmLightPosWorld", tsmLight.transform.position);
     }
 
     void Update()
@@ -76,13 +85,13 @@ public class RenderHelper : MonoBehaviour
 
     void ComputeVirtualViewDepth()
     {
-        virtualViewCamera.targetTexture = virtualViewDepthTexture;
-        virtualViewCamera.RenderWithShader(depthMaterial.shader, "");
+        virtualCamera.targetTexture = virtualViewDepthTexture;
+        virtualCamera.RenderWithShader(depthMaterial.shader, "");
     }
 
     void ComputeErrorRate()
     {
-        virtualViewCamera.targetTexture = errorRateTexture;
-        virtualViewCamera.RenderWithShader(errorRateMaterial.shader, "");
+        virtualCamera.targetTexture = errorRateTexture;
+        virtualCamera.RenderWithShader(errorRateMaterial.shader, "");
     }
 }
