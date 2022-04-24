@@ -20,6 +20,7 @@ Shader "Skin/Compute irradiance"
 			uniform sampler2D _NormalMap;
 			uniform sampler2D _AttenuationTex;
 			uniform sampler2D _TSMTex;
+			uniform half4 _TSMTEX_TexelSize;
 			uniform float _Roughness;
 			uniform float _SpecPower;
 			uniform float _Mix;
@@ -43,7 +44,7 @@ Shader "Skin/Compute irradiance"
 				float4 pos : SV_POSITION;
 				float2 tex : TEXCOORD0;
 				float3 posWorld : TEXCOORD1;
-				float3 viewDir : TEXCOORD2;
+				// float3 viewDir : TEXCOORD2;
 				float3 lightDir : TEXCOORD3;
 			};
 
@@ -55,7 +56,7 @@ Shader "Skin/Compute irradiance"
 				o.pos = float4(coords, 0.0, 1.0);
 				o.posWorld = mul(unity_ObjectToWorld, v.vertex).xyz;
 				o.tex = v.tex;
-				o.viewDir = _WorldSpaceCameraPos.xyz - o.posWorld;
+				// o.viewDir = _WorldSpaceCameraPos.xyz - o.posWorld;
 				o.lightDir = UnityWorldSpaceLightDir(o.posWorld);
 
 				return o;
@@ -64,12 +65,20 @@ Shader "Skin/Compute irradiance"
 			float calculateThickness(float3 posWorld, float3 normal, float nDotL)
 			{
 				// Read TSM
+				
 				float4 posLightProjCoord = mul(_LightViewProj, float4(posWorld, 1.0));
 				float2 lightCoord = posLightProjCoord.xy / posLightProjCoord.w;
 				lightCoord = lightCoord * 0.5 + 0.5;
-				lightCoord.y = 1.0 - lightCoord.y;
+				
+				// 在DX11平台下生成的RenderTexture的y轴正方向是向下的，与OpenGL平台相反
+				// 所以这里要针对DX11平台手动上下翻转纹理采样坐标
+				// 如果注释了以下代码，会渲染出错误的透光效果（导致不透光的位置透光）
+				#if UNITY_UV_STARTS_AT_TOP
+					lightCoord.y = 1.0 - lightCoord.y;
+				#endif
+				
 				float4 tsmTap = tex2D(_TSMTex, lightCoord);
-
+				
 				// Incident normal
 				float3 normal_i_ObjectSpace = tex2D(_NormalMap, tsmTap.yz).rgb - 0.5;
 				normal_i_ObjectSpace.x = -normal_i_ObjectSpace.x;
@@ -95,7 +104,7 @@ Shader "Skin/Compute irradiance"
 
 			float4 frag(v2f i) : COLOR
 			{
-				i.viewDir = normalize(i.viewDir);
+				// i.viewDir = normalize(i.viewDir);
 				i.lightDir = normalize(i.lightDir);
 
 				// Sample object space normal

@@ -2,36 +2,76 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class RenderHelper : MonoBehaviour
 {
     public Material multiTsmMaterial;
     public Material depthMaterial;
     public Material errorRateMaterial;
-    public Material lightTsmMaterial;
 
     public Camera virtualViewCamera;
-    private int textureSize = 512;
+    public int textureSize = 512;
+    
+    public Light tsmLight;
+    private TsmLight tsmLightScript;
 
-    private RenderTexture lightTsmTexture; 
+    private RenderTexture tsmTexture;
+    private RenderTexture tsmIrradianceTexture;
     private RenderTexture virtualViewDepthTexture;
-    private RenderTexture depthCorrectionTexture;
+    private RenderTexture errorRateTexture;
+
+    public float errorTestCountPerFrag = 16;
     void Start()
     {
-        InitializeTextures();
-        SetUniforms();
+        tsmTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
+        tsmIrradianceTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
+        virtualViewDepthTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.Depth);
+        errorRateTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
         
+        InitializeTsmLight();
+        
+        SetUniforms();
     }
 
-    void InitializeTextures()
+    void InitializeTsmLight()
     {
-        lightTsmTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
-        virtualViewDepthTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.Depth);
-        depthCorrectionTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.RHalf);
+        if (!tsmLight)
+        {
+            Debug.LogError("No light set for translucent shadow map.");
+        }
+
+        tsmLightScript = tsmLight.GetComponent<TsmLight>();
+        if (!tsmLightScript)
+        {
+            Debug.LogError("No TSM_Light script attached to TSM light.");
+        }
+        
+        tsmLightScript.InitializeLightCamera();
+        tsmLightScript.SetTsmTexture(tsmTexture);
+        tsmLightScript.SetTsmIrradianceTexture(tsmIrradianceTexture);
     }
 
     void SetUniforms()
     {
-        
+        Shader.SetGlobalTexture("_VirtualViewDepthTex", virtualViewDepthTexture);
+        Shader.SetGlobalFloat("_ErrorTestCountPerFrag", errorTestCountPerFrag);
+        Shader.SetGlobalTexture("_TsmTex", tsmTexture);
+        Shader.SetGlobalTexture("_TsmIrradianceTex", tsmIrradianceTexture);
+        Matrix4x4 worldToLightViewProjMatrix = tsmLightScript.GetWorldToLightViewProjMatrix();
+        Shader.SetGlobalMatrix("_WorldToLight_VP", worldToLightViewProjMatrix);
+    }
+
+    void Update()
+    {
+        ComputeTsm();
+        ComputeVirtualViewDepth();
+        ComputeErrorRate();
+    }
+    
+    void ComputeTsm()
+    {
+       tsmLightScript.RenderTsm();
+       tsmLightScript.RenderTsmIrradiance();
     }
 
     void ComputeVirtualViewDepth()
@@ -40,13 +80,9 @@ public class RenderHelper : MonoBehaviour
         virtualViewCamera.RenderWithShader(depthMaterial.shader, "");
     }
 
-    void ComputeLightTsm()
+    void ComputeErrorRate()
     {
-        
-    }
-
-    void Update()
-    {
-        ComputeVirtualViewDepth();
+        virtualViewCamera.targetTexture = errorRateTexture;
+        virtualViewCamera.RenderWithShader(errorRateMaterial.shader, "");
     }
 }

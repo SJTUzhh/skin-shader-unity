@@ -38,7 +38,7 @@ Shader "Skin/TSM"
 				return o;
 			}
 
-			float4 frag(v2f i) : COLOR
+			float4 frag(v2f i) : SV_Target
 			{
 				return float4(i.depth, i.tex.x, i.tex.y, 1.0);
 			}

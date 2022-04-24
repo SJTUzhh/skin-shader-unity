@@ -16,7 +16,7 @@ public class SkinHelper : MonoBehaviour
 	public Material applyShadowsMaterial;
 
 	public Light tsmLight;
-	private TSM_Light lightCameraScript;
+	private TsmLight lightCameraScript;
 
 	private Camera dummyCamera;
 	private int textureSize;
@@ -55,12 +55,14 @@ public class SkinHelper : MonoBehaviour
 			Debug.LogError("No light set for translucent shadow map.");
 		}
 
-		lightCameraScript = tsmLight.GetComponent<TSM_Light>();
+		lightCameraScript = tsmLight.GetComponent<TsmLight>();
 		if (!lightCameraScript)
 		{
 			Debug.LogError("No TSM_Light script attached to TSM light.");
 		}
-		lightCameraScript.SetTSMTexture(tsmTexture);
+		
+		lightCameraScript.InitializeLightCamera();
+		lightCameraScript.SetTsmTexture(tsmTexture);
 
 		// Create a dummy camera. This will be used for calling RenderWithShader with a 
 		// specific clear color, without having to change the main camera
@@ -122,7 +124,7 @@ public class SkinHelper : MonoBehaviour
 		skinMaterial.SetTexture("_AlphaMaskTex", alphaTexture);
 		skinMaterial.SetFloat("_TextureSize", textureSize);
 		skinMaterial.SetFloat("_StretchScale", 0.001f);
-		skinMaterial.SetMatrix("_LightViewProj", lightCameraScript.GetLightViewProjMatrix());
+		skinMaterial.SetMatrix("_LightViewProj", lightCameraScript.GetWorldToLightViewProjMatrix());
 
 		gaussianUMaterial.SetFloat("_TextureSize", textureSize);
 		gaussianVMaterial.SetFloat("_TextureSize", textureSize);
@@ -169,7 +171,7 @@ public class SkinHelper : MonoBehaviour
 		dummyCamera.backgroundColor = new Color(0.0f, 0.0f, 0.0f, 0.0f); 
 
 		// Compute TSM
-		lightCameraScript.RenderTSM();
+		lightCameraScript.RenderTsm();
 		skinMaterial.SetTexture("_TSMTex", tsmTexture);
 
 		// Compute diffuse irradiance
