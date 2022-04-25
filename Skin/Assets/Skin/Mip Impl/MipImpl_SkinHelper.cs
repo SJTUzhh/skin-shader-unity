@@ -67,6 +67,7 @@ public class MipImpl_SkinHelper : MonoBehaviour
 		{
 			Debug.LogError("No TSM_Light script attached to TSM light.");
 		}
+		lightCameraScript.InitializeLightCamera();
 		lightCameraScript.SetTsmTexture(tsmTexture);
 
 		// Create a dummy camera. This will be used for calling RenderWithShader with a 
@@ -151,7 +152,6 @@ public class MipImpl_SkinHelper : MonoBehaviour
 
 	void SetUniforms()
 	{
-		Debug.Log("WHY");
 		skinMaterial.SetTexture("_BeckmannTex", beckmannTexture);
 		skinMaterial.SetTexture("_IrradianceTex", applyShadows ? irradiance2Texture : irradianceTexture);
 		skinMaterial.SetTexture("_AttenuationTex", attenuationTexture);
@@ -169,7 +169,7 @@ public class MipImpl_SkinHelper : MonoBehaviour
 
 		// gaussianUMaterial.SetFloat("_TextureSize", textureSize);
 		// gaussianVMaterial.SetFloat("_TextureSize", textureSize);
-		//
+		
 		// alphaMaskMaterial.SetTexture("_StretchTex", stretchTexture);
 		// alphaMaskMaterial.SetTexture("_Blur2StretchTex", blur2StretchTexture);
 		// alphaMaskMaterial.SetTexture("_Blur3StretchTex", blur3StretchTexture);

@@ -21,6 +21,7 @@ public class RenderHelper : MonoBehaviour
     private RenderTexture errorRateTexture;
 
     public float errorTestCountPerFrag = 16;
+    public float objectGrowFactor = 0.1f;
     void Start()
     {
         tsmTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
@@ -68,6 +69,7 @@ public class RenderHelper : MonoBehaviour
         Shader.SetGlobalMatrix("_WorldToVirtualCam_VP", worldToVirtCamViewProjMatrix);
         
         Shader.SetGlobalVector("_TsmLightPosWorld", tsmLight.transform.position);
+        Shader.SetGlobalFloat("_ObjectGrowFactor", objectGrowFactor);
     }
 
     void Update()

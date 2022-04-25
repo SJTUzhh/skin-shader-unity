@@ -13,6 +13,7 @@
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
+			float _ObjectGrowFactor;
 
 			struct a2v
 			{
@@ -33,7 +34,7 @@
 			{
 				v2f o;
 
-				o.pos = UnityObjectToClipPos(v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex + v.normal * _ObjectGrowFactor);
 				o.tex = v.tex;
 				o.worldNormal = normalize(UnityObjectToWorldNormal(v.normal));
 				float3 posWorld = mul(unity_ObjectToWorld, v.vertex).xyz;

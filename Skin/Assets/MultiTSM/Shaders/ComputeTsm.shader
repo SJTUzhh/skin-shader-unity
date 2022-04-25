@@ -11,9 +11,12 @@
 			#pragma fragment frag
 			#include "UnityCG.cginc"
 
+			float _ObjectGrowFactor;
+
 			struct a2v
 			{
 				float4 vertex : POSITION;
+				float4 normal : NORMAL;
 			};
 
 			struct v2f
@@ -27,7 +30,7 @@
 			{
 				v2f o;
 				o.posWorld = mul(unity_ObjectToWorld, v.vertex).xyz;
-				o.pos = UnityWorldToClipPos(float4(o.posWorld, 1.0));
+				o.pos = UnityObjectToClipPos(v.vertex + _ObjectGrowFactor * v.normal);
 				o.depth = length(UnityObjectToViewPos(v.vertex));
 
 				return o;

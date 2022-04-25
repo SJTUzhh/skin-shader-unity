@@ -92,7 +92,7 @@
                 // Thickness
                 float tsmTapDepthToLight = tex2D(_TsmTex, tsmTapUv).w;
                 float depthToLight = length(_TsmLightPosWorld - i.posWorld);
-                float thickness = depthToLight - tsmTapDepthToLight;
+                float thickness = max(0, depthToLight - tsmTapDepthToLight);
 
                 // Error rate
                 float2 errorRateTapUv = getCameraSpaceUv(float4(i.posWorld, 1.0), _WorldToVirtualCam_VP);
@@ -104,27 +104,32 @@
                 // Corrected thickness
                 if(_UseErrorRateCorrection > 0.0)
                 {
-                    thickness *= (1 - errorRate);
+                    thickness *= 1.0 - errorRate;
                 }
                 // thickness *= 0.01;
                 // Set a large distance for surface points facing the light
-                thickness = nDotL > 0.0 ? 500.0 : thickness;
+                // thickness = nDotL > 0.0 ? 500.0 : thickness;
 
                 // Translucent color
                 float3 translucentColor = tex2D(_TsmIrradianceTex, tsmTapUv).xyz;
                 translucentColor *= exp(-1.0 * _ScatteringRate * thickness);
 
                 float3 final = translucentColor + directColor;
-                
-                return float4(final, 1.0);
-                return float4(errorRate, 0.0, 0.0, 1.0);
+
+                // return float4(directColor, 1.0);
+                return float4(translucentColor, 1.0);
+                // return float4(errorRate, 0.0, 0.0, 1.0);
+                // return float4(depthToLight / 5.0, 0.0, 0.0, 1.0);
+                // return float4(tsmTapUv, 0.0, 1.0);
+                // return float4(tsmTapDepthToLight / 7.0, 0.0, 0.0, 1.0);
+                // return float4(thickness / 1.0, 0.0, 0.0, 1.0);
+                // return float4(final, 1.0);
+                // return float4(errorRate, 0.0, 0.0, 1.0);
                 // return float4(tsmTapDepthToLight, 0.0, 0.0, 1.0);
                 // return float4(_LightColor0);
                 return float4(_WorldSpaceLightPos0);
                 return float4(errorRateTapUv, 0.0, 1.0);
-                return float4(tsmTapUv, 0.0, 1.0);  
                 return float4(thickness, 0.0, 0.0, 1.0);
-                return float4(translucentColor, 1.0);
                 return float4(errorRate, 0.0, 0.0, 1.0);
             }
             

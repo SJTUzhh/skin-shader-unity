@@ -54,7 +54,7 @@
                 tsmTapPosScreen = tsmTapPosScreen / tsmTapPosScreen.w;
                 
                 int errorCount = 0;
-                half bias = 0.001;
+                half bias = 0.01;
                 float3 toTapStep = (tsmTapPosScreen.xyz - i.posScreen.xyz) / _ErrorTestCountPerFrag;
                 float3 testPos = i.posScreen.xyz;
                 
@@ -65,7 +65,7 @@
 					    testUv.y = 1.0 - testUv.y;
 				    #endif 
                     float testDepth = tex2D(_VirtualViewDepthTex, testUv.xy);
-                    if(testDepth == 0.0)
+                    if(/*testDepth == 0.0 || */testDepth < testPos.z - bias)
                     {
                         errorCount++;
                     }

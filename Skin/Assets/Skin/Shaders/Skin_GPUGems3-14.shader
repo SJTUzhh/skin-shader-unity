@@ -119,7 +119,9 @@ Shader "Skin/Skin (GPU Gems 3 - 14)"
 				float4 posLightProjCoord = mul(_LightViewProj, float4(i.posWorld, 1.0));
 				float2 lightCoord = posLightProjCoord.xy / posLightProjCoord.w;
 				lightCoord = lightCoord * 0.5 + 0.5;
-				lightCoord.y = 1.0 - lightCoord.y;
+				#if UNITY_UV_STARTS_AT_TOP
+					lightCoord.y = 1.0 - lightCoord.y;
+				#endif
 				float4 tsmTap = tex2D(_TSMTex, lightCoord);
 
 				// We only consider the contribution for the 4 most blurred taps. For tap n, 
