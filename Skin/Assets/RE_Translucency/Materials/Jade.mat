@@ -1,0 +1,190 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Jade
+  m_Shader: {fileID: 4800000, guid: 519c3e77f88dc194293cce52d11546df, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _AmbientCube
+      second:
+        m_Texture: {fileID: 8900000, guid: de78f930088fc194290da7400c89bfb5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _BumpMap
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _DetailAlbedoMap
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _DetailMask
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _DetailNormalMap
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _EmissionMap
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 2800000, guid: a867bb502f302be468bd6a89c3fcba6f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MetallicGlossMap
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _OcclusionMap
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _ParallaxMap
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _PenetrationMask
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _ScatterTex
+      second:
+        m_Texture: {fileID: 2800000, guid: 28eae8143c5f3274eb560ad9b52c5e63, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - first:
+        name: _AmbientFactor
+      second: 0.5
+    - first:
+        name: _AmbientMin
+      second: 0.7
+    - first:
+        name: _BlackPivot
+      second: 0.999
+    - first:
+        name: _BumpScale
+      second: 1
+    - first:
+        name: _Color1Dist
+      second: 0.3
+    - first:
+        name: _Color2Dist
+      second: 0.6
+    - first:
+        name: _Cutoff
+      second: 0.5
+    - first:
+        name: _DetailNormalMapScale
+      second: 1
+    - first:
+        name: _DstBlend
+      second: 0
+    - first:
+        name: _FresnelIntensity
+      second: 0.512
+    - first:
+        name: _Glossiness
+      second: 0.5
+    - first:
+        name: _MaskIntensity
+      second: 0
+    - first:
+        name: _MaxDist
+      second: 4.82
+    - first:
+        name: _Metallic
+      second: 0
+    - first:
+        name: _MinDist
+      second: 3.76
+    - first:
+        name: _Mode
+      second: 0
+    - first:
+        name: _OcclusionStrength
+      second: 1
+    - first:
+        name: _Parallax
+      second: 0.02
+    - first:
+        name: _PenetrationFactor
+      second: 0.63
+    - first:
+        name: _PenetrationPivot
+      second: 1
+    - first:
+        name: _Pivot
+      second: 0.976
+    - first:
+        name: _Reverse
+      second: 0
+    - first:
+        name: _SrcBlend
+      second: 1
+    - first:
+        name: _UVSec
+      second: 0
+    - first:
+        name: _ZWrite
+      second: 1
+    - first:
+        name: _exp_factor
+      second: 1
+    m_Colors:
+    - first:
+        name: _Color
+      second: {r: 1, g: 1, b: 1, a: 1}
+    - first:
+        name: _Color0
+      second: {r: 0.98039216, g: 0.972549, b: 0.78039217, a: 1}
+    - first:
+        name: _Color1
+      second: {r: 0.7254902, g: 0.21960784, b: 0.14509805, a: 1}
+    - first:
+        name: _Color2
+      second: {r: 0.34901962, g: 0.14901961, b: 0.1764706, a: 1}
+    - first:
+        name: _EmissionColor
+      second: {r: 0, g: 0, b: 0, a: 1}
+    - first:
+        name: _LightColor
+      second: {r: 0.60294116, g: 0.21723615, b: 0.21723615, a: 1}
+    - first:
+        name: _MainColor
+      second: {r: 0.34731835, g: 0.53676474, b: 0.40459287, a: 1}

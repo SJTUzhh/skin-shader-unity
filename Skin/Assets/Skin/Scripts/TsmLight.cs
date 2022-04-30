@@ -4,7 +4,7 @@ using System.Collections;
 [ExecuteInEditMode]
 public class TsmLight : MonoBehaviour
 {
-	// (向光点(world).x, 向光点(world).y, 向光点(world).z, 向光点(light).length)
+	// 保存光路入射点的xyz坐标
 	private RenderTexture tsmTexture;
 	public Material tsmMaterial;
 

@@ -2,11 +2,16 @@
 {
     Properties
     {
+        //TRANSLUCENCY
+		_Absorption("Absorption", Color) = (1,1,1,1)
+		_ThicknessPower("Thickness Power", Float) = 1
+        
         _MainTex ("Diffuse Texture", 2D) = "white" {}	
         _Specular ("Specular Color", Color) = (1, 1, 1, 1)
         _Gloss ("Gloss", Range(8.0, 256)) = 20
-        _ScatteringRate ("Scattering Rate", Range(0.0, 10.0)) = 0.3
+        // _ScatteringRate ("Scattering Rate", Range(0.0, 10.0)) = 0.3
         _ErrorRateMipLevel ("Error Rate Mip Level", Range(1.0, 10.0)) = 1
+        _TsmMipLevel ("TSM Tex Mip Level", Range(1.0, 10.0)) = 1
         _UseErrorRateCorrection ("Use Error Rate Correction", Range(-1.0, 1.0)) = 1.0
     }
         SubShader
@@ -24,16 +29,21 @@
 
             sampler2D _MainTex;
             sampler2D _TsmTex;
-            sampler2D _TsmIrradianceTex;
+            float _TsmTex_TexelSize;
+            // sampler2D _TsmIrradianceTex;
             sampler2D _ErrorRateTex;
             float4x4 _WorldToLight_VP;
             float4x4 _WorldToVirtualCam_VP;
             float4 _TsmLightPosWorld;
             float4 _Specular;
             float _Gloss;
-            float _ScatteringRate;
+            float4 _Absorption;
+            // float _ScatteringRate;
+            float _ThicknessPower;
+            float _TsmMipLevel;
             float _ErrorRateMipLevel;
             float _UseErrorRateCorrection;
+            
 
             struct a2v
             {
@@ -78,8 +88,8 @@
                 float3 halfDir = normalize(lightDir + viewDir);
                 float3 specular = _LightColor0.rgb * _Specular.rgb * pow(max(0, dot(i.worldNormal, halfDir)), _Gloss);
                 float nDotL = dot(i.worldNormal, lightDir);
-				float3 albedo = tex2D(_MainTex, i.tex).rgb;
-				float3 diffuse = max(0.0, nDotL) * _LightColor0.rgb * albedo;
+				// float3 albedo = tex2D(_MainTex, i.tex).rgb;
+				float3 diffuse = /*max(0.0, nDotL)*/ (nDotL * 0.5 + 0.5) * _LightColor0.rgb * _Absorption/* * albedo*/;
 				float3 directColor = diffuse + specular;
 
                 // Get the TSM tap uv
@@ -90,7 +100,7 @@
                 #endif
                 
                 // Thickness
-                float tsmTapDepthToLight = tex2D(_TsmTex, tsmTapUv).w;
+                float tsmTapDepthToLight = tex2Dlod(_TsmTex, float4(tsmTapUv, 0.0, _TsmMipLevel)).w;
                 float depthToLight = length(_TsmLightPosWorld - i.posWorld);
                 float thickness = max(0, depthToLight - tsmTapDepthToLight);
 
@@ -111,20 +121,24 @@
                 // thickness = nDotL > 0.0 ? 500.0 : thickness;
 
                 // Translucent color
-                float3 translucentColor = tex2D(_TsmIrradianceTex, tsmTapUv).xyz;
-                translucentColor *= exp(-1.0 * _ScatteringRate * thickness);
+                // float3 translucentColor = tex2D(_TsmIrradianceTex, tsmTapUv).xyz;
+                // translucentColor *= exp(-1.0 * _ScatteringRate * thickness);
 
-                float3 final = translucentColor + directColor;
+                // thickness = 0;
 
+                float4 absorption = exp(-mul(thickness, _ThicknessPower) * _Absorption.a * 1.0) * _Absorption;
+                float3 final = absorption * _LightColor0.rgb + specular + _Absorption * 0.1;// directColor;
+
+                // return float4(absorption);
                 // return float4(directColor, 1.0);
-                return float4(translucentColor, 1.0);
-                // return float4(errorRate, 0.0, 0.0, 1.0);
-                // return float4(depthToLight / 5.0, 0.0, 0.0, 1.0);
-                // return float4(tsmTapUv, 0.0, 1.0);
-                // return float4(tsmTapDepthToLight / 7.0, 0.0, 0.0, 1.0);
-                // return float4(thickness / 1.0, 0.0, 0.0, 1.0);
                 // return float4(final, 1.0);
-                // return float4(errorRate, 0.0, 0.0, 1.0);
+                return float4(errorRate, 0.0, 0.0, 1.0);
+                // return float4(depthToLight / 10.0, 0.0, 0.0, 1.0);
+                //  return float4(tsmTapUv, 0.0, 1.0);
+                // return float4(tsmTapDepthToLight / 10.0, 0.0, 0.0, 1.0);
+                return float4(thickness / 1.0, 0.0, 0.0, 1.0);
+                // return float4(final, 1.0);
+                return float4(errorRate, 0.0, 0.0, 1.0);
                 // return float4(tsmTapDepthToLight, 0.0, 0.0, 1.0);
                 // return float4(_LightColor0);
                 return float4(_WorldSpaceLightPos0);

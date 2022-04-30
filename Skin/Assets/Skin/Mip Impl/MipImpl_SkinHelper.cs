@@ -188,6 +188,7 @@ public class MipImpl_SkinHelper : MonoBehaviour
 			
 			gaussianMaterial.SetFloatArray("_MipBlendWeights", mipBlendWeightsForShadows);
 			gaussianMaterial.SetInt("_MipCount", mipBlendWeightsForShadows.Length);
+			
 			Graphics.Blit(shadowTexture, tempRenderTexture, gaussianMaterial);
 			Graphics.Blit(tempRenderTexture, shadowTexture);
 			tempRenderTexture.Release();

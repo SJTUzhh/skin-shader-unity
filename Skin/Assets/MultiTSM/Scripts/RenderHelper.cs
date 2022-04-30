@@ -30,6 +30,8 @@ public class RenderHelper : MonoBehaviour
         errorRateTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
         errorRateTexture.autoGenerateMips = true;
         errorRateTexture.useMipMap = true;
+        tsmTexture.autoGenerateMips = true;
+        tsmTexture.useMipMap = true;
         
         InitializeTsmLight();
         

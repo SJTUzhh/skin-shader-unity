@@ -48,6 +48,7 @@
 				float nDotL = dot(i.worldNormal, i.lightDir);
 				float3 albedo = tex2D(_MainTex, i.tex).rgb;
 				float3 diffuse = max(0.0, nDotL) * _LightColor0.rgb;
+				// float3 diffuse = (nDotL * 0.5 + 0.5) * _LightColor0.rgb;
 				float3 final = diffuse * albedo;
 				return float4(final.x, final.y, final.z, 1.0);
 			}

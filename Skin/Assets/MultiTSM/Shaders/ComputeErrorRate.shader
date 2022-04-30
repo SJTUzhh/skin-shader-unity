@@ -14,10 +14,13 @@
             sampler2D _TsmTex;
             float _ErrorTestCountPerFrag;
             float4x4 _WorldToLight_VP;
+
+            float _ObjectGrowFactor;
             
             struct a2v
             {
                 float4 vertex : POSITION;
+                float4 normal : NORMAL;
             };
 
             struct v2f
@@ -31,7 +34,7 @@
             {
                 v2f o;
                 o.posWorld = mul(unity_ObjectToWorld, v.vertex).xyz;
-                o.pos = UnityWorldToClipPos(o.posWorld);
+                o.pos = UnityWorldToClipPos(o.posWorld + _ObjectGrowFactor * v.normal);
                 float4 posScreen = ComputeScreenPos(o.pos);
                 o.posScreen = (posScreen / posScreen.w).xyz;
                 return o;
@@ -56,8 +59,8 @@
                 int errorCount = 0;
                 half bias = 0.01;
                 float3 toTapStep = (tsmTapPosScreen.xyz - i.posScreen.xyz) / _ErrorTestCountPerFrag;
-                float3 testPos = i.posScreen.xyz;
                 
+                float3 testPos = i.posScreen.xyz;
                 for(int idx = 0; idx < _ErrorTestCountPerFrag; idx++)
                 {
                     float2 testUv = testPos.xy;
@@ -71,6 +74,10 @@
                     }
                     testPos += toTapStep;
                 }
+
+                // 距离太短，没有测试的必要了
+                if(length(toTapStep) < 0.01) errorCount = 0;
+                    // return float4(0.0, 0.0, 0.0, 1.0);
 
                 return float4(float(errorCount) / _ErrorTestCountPerFrag, 0.0, 0.0, 1.0);
                 // return float4(i.posScreen.xyz, 1.0);
