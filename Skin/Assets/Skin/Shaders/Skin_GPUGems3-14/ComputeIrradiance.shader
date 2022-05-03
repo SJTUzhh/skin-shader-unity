@@ -102,7 +102,7 @@ Shader "Skin/Compute irradiance"
 				return finalThickness;
 			}
 
-			float4 frag(v2f i) : COLOR
+			float4 frag(v2f i) : SV_Target
 			{
 				// i.viewDir = normalize(i.viewDir);
 				i.lightDir = normalize(i.lightDir);
@@ -125,6 +125,7 @@ Shader "Skin/Compute irradiance"
 				float3 final = lighting * pow(albedo, _Mix);
 
 				float alpha = exp(thickness * -_ThicknessConst);
+				// return float4(0.1, 0.0, 0.0, alpha);
 				return float4(final, alpha);
 			}
 			ENDCG
