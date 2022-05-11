@@ -38,7 +38,7 @@
 
             #define SIGMA 10.0
 			#define BSIGMA 0.1
-			#define MSIZE 15
+			#define MSIZE 5
 
 			float normpdf(float x, float sigma)
 			{

@@ -51,6 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Amazing Assets\Subsurface Scattering Shader\Example Scenes\Scripts\CameraOrbitalMove.cs" />
+     <Compile Include="Assets\Jade MultiView\Scripts\FpsController.cs" />
      <Compile Include="Assets\Jade MultiView\Scripts\JadeMultiViewHelper.cs" />
      <Compile Include="Assets\MultiTSM\Scripts\RenderHelper.cs" />
      <Compile Include="Assets\RE_Translucency\Scripts\FPS.cs" />

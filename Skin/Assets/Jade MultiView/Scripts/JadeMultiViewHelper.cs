@@ -21,7 +21,7 @@ public class JadeMultiViewHelper : MonoBehaviour
     private RenderTexture topdownDepthTexture;
     private RenderTexture penetrationTexture;
     private RenderTexture penetrationTexture2;
-    private RenderTexture tempGaussianTexture;
+    // private RenderTexture tempGaussianTexture;
 
     public int textureSize = 512;
 
@@ -32,10 +32,10 @@ public class JadeMultiViewHelper : MonoBehaviour
         tsmTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
         topdownDepthTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.Depth);
         penetrationTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
-        penetrationTexture.autoGenerateMips = true;
-        penetrationTexture.useMipMap = true;
+        // penetrationTexture.autoGenerateMips = true;
+        // penetrationTexture.useMipMap = true;
         penetrationTexture2 = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
-        tempGaussianTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
+        // tempGaussianTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
 
         
         InitializeScene();
@@ -57,11 +57,11 @@ public class JadeMultiViewHelper : MonoBehaviour
         
         Shader.SetGlobalFloat("_TextureSize", textureSize);
 
-        float blurStepScale = jadeMultiViewMaterial.GetFloat("_BlurStepScale");
-        gaussianUMaterial.SetFloat("_BlurStepScale", blurStepScale);
-        gaussianVMaterial.SetFloat("_BlurStepScale", blurStepScale);
+        // float blurStepScale = jadeMultiViewMaterial.GetFloat("_BlurStepScale");
+        // gaussianUMaterial.SetFloat("_BlurStepScale", blurStepScale);
+        // gaussianVMaterial.SetFloat("_BlurStepScale", blurStepScale);
         
-        jadeMultiViewMaterial.SetTexture("_PenetrationTexture", penetrationTexture);
+        jadeMultiViewMaterial.SetTexture("_PenetrationTexture", penetrationTexture2);
         
     }
     
@@ -102,22 +102,22 @@ public class JadeMultiViewHelper : MonoBehaviour
         
         // Bilateral filter
         Graphics.Blit(penetrationTexture, penetrationTexture2, BilateralFilterMaterial);
-        Graphics.Blit(penetrationTexture2, penetrationTexture/*, FillBackgroundMaterial*/);
+        // Graphics.Blit(penetrationTexture2, penetrationTexture/*, FillBackgroundMaterial*/);
         
         // GaussianBlur(0.002f, penetrationTexture2, penetrationTexture);
 
     }
 
-    void GaussianBlur(float variance, RenderTexture source, RenderTexture destination)
-    {
-        // The gaussian width is the standard deviation (square root of the variance)
-        float width = Mathf.Sqrt(variance);
-        gaussianUMaterial.SetFloat("_GaussianWidth", width);
-        gaussianVMaterial.SetFloat("_GaussianWidth", width);
-        
-        Graphics.Blit(source, tempGaussianTexture, gaussianUMaterial);
-        Graphics.Blit(tempGaussianTexture, destination, gaussianVMaterial);
-    }
+    // void GaussianBlur(float variance, RenderTexture source, RenderTexture destination)
+    // {
+    //     // The gaussian width is the standard deviation (square root of the variance)
+    //     float width = Mathf.Sqrt(variance);
+    //     gaussianUMaterial.SetFloat("_GaussianWidth", width);
+    //     gaussianVMaterial.SetFloat("_GaussianWidth", width);
+    //     
+    //     Graphics.Blit(source, tempGaussianTexture, gaussianUMaterial);
+    //     Graphics.Blit(tempGaussianTexture, destination, gaussianVMaterial);
+    // }
     
 }
 

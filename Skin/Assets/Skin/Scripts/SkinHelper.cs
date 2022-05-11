@@ -220,9 +220,11 @@ public class SkinHelper : MonoBehaviour
 		gaussianVMaterial.SetFloat("_GaussianWidth", width);
 
 		// Blur stretch texture
-		gaussianUMaterial.SetTexture("_StretchTex", null); // No stretch, default = white texture
+		// Stretch blur doesn't need stretch correction, so default = white texture
+		gaussianUMaterial.SetTexture("_StretchTex", null); 
 		Graphics.Blit(sourceStretch, tempGaussianTexture, gaussianUMaterial);
-		gaussianVMaterial.SetTexture("_StretchTex", null); // No stretch, default = white texture
+		// Stretch blur doesn't need stretch correction, so default = white texture
+		gaussianVMaterial.SetTexture("_StretchTex", null); 
 		Graphics.Blit(tempGaussianTexture, destinationStretch, gaussianVMaterial);
 
 		// Blur source texture

@@ -19,7 +19,7 @@
 		_PenetrationTestCount ("Penetration Test Count", float) = 16
 		_OpenErrorCorrection ("Open Penetration Error Correction", Range(-1, 1)) = 1
 	
-		_BlurStepScale ("Gaussian Sample Distance Scale", Range(0.01, 1.0)) = 0.01
+		// _BlurStepScale ("Gaussian Sample Distance Scale", Range(0.01, 1.0)) = 0.01
 		
 		_PointLightColor("Point Light Color", Color) = ( 1,1,1,1 )
 		_PointLightIntensity("Point Light Intensity", Range(0.0, 5.0)) = 1.0
@@ -107,6 +107,7 @@
             	float2 uv : TEXCOORD0;
             	float3 normalWorld : TEXCOORD1;
             	float3 eyeDirWorld : TEXCOORD2;
+            	// float3 posWorld : TEXCOORD3;
             };
             
             v2f vert(a2v v)
@@ -114,8 +115,9 @@
 				v2f o;
 				o.pos = UnityObjectToClipPos(v.vertex);
             	o.uv = v.uv;
-            	o.normalWorld = UnityObjectToWorldNormal(v.normal);
-            	o.eyeDirWorld = -normalize(UnityWorldSpaceViewDir(mul(unity_ObjectToWorld, v.vertex).xyz));
+            	o.normalWorld = UnityObjectToWorldNormal(v.normal); // normalized
+            	o.eyeDirWorld = normalize(UnityWorldSpaceViewDir(mul(unity_ObjectToWorld, v.vertex).xyz));
+            	// o.posWorld = mul(unity_ObjectToWorld, v.vertex).xyz;
 
             	return o;
             	
@@ -137,14 +139,19 @@
 					penetrationWeight = 1.0 - penetrationWeight;
 				}
             	float penetrationExp = penetrationWeight;
-            	float3 penetrateIrradiance = penetrationExp * _PointLightColor  * _PointLightIntensity * 1.0  * (penetrationExp * penetrationExp);
+            	// float4 L = normalize(_TsmLightPosWorld - float4(i.posWorld, 1.0));
+            	// float vDotL = max(0, dot(float4(i.eyeDirWorld, 1.0), -L));
+            	// float nDotL = dot(float4(i.normalWorld, 1.0), L);
+            	// float outAttenuation = nDotL + vDotL;
+            	// return float4(nDotL, 0.0, 0.0, 1.0);
+            	float3 penetrateIrradiance = /* vDotL * penetrationExp * */_PointLightColor  * _PointLightIntensity * 1.0  * (penetrationExp * penetrationExp);
 
             	float4 DiffuseTex = tex2D(_MainTex, i.uv);
 				// float3 UsedColor = _MainColor;// *( 1.0 - _DiffuseIntensity ) + DiffuseTex * _DiffuseIntensity;// Blend( _MainColor, _MainColor * DiffuseTex, _DiffuseIntensity );// *_MainColor;
 				float3 DiffuseContrib = _MainColor * penetrateIrradiance;// DiffuseTexel;
 				DiffuseContrib += DiffuseTex * _DiffuseIntensity;
 	            
-				float3 reflectRay = reflect( normalize(i.normalWorld), i.eyeDirWorld);
+				float3 reflectRay = normalize(reflect(i.normalWorld, -i.eyeDirWorld));
 				float4 ambientColor = texCUBElod(_AmbientCube, float4(reflectRay, _AmbientLOD));
 				float3 finalColor = DiffuseContrib;
 				ambientColor = max(ambientColor, _AmbientMin);

@@ -82,14 +82,16 @@ public class MipImpl_SkinHelper : MonoBehaviour
 		Graphics.Blit(attenuationTexture, attenuationTexture, attenuationMaterial);
 
 		// 计算各个高斯核的 Mip 混合权重
-		mipLevelCount = irradianceTexture.mipmapCount;
+		float blurStepScale = skinMaterial.GetFloat("_BlurStepScale");
+		blurStepScale *= blurStepScale;
+		mipLevelCount = applyShadows ? irradiance2Texture.mipmapCount : irradianceTexture.mipmapCount;
 		gaussiansMipBlendWeights = new float[gaussionWvNames.Length][];
 		for(int currGaussionIdx = 0; currGaussionIdx < gaussionWvNames.Length; currGaussionIdx++)
 		{
 			float variance = skinMaterial.GetVector(gaussionWvNames[currGaussionIdx]).w;
-			gaussiansMipBlendWeights[currGaussionIdx] = GaussianMipBlendWeights(variance, mipLevelCount);
+			gaussiansMipBlendWeights[currGaussionIdx] = GaussianMipBlendWeights(variance / blurStepScale, mipLevelCount);
 		}
-		mipBlendWeightsForShadows = GaussianMipBlendWeights(1, mipLevelCount);
+		mipBlendWeightsForShadows = GaussianMipBlendWeights(1 / blurStepScale, mipLevelCount);
 		
 		SetUniforms();
 	}
@@ -103,10 +105,20 @@ public class MipImpl_SkinHelper : MonoBehaviour
 		tsmTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
 		// alphaTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.R8);
 		tempRenderTexture = new RenderTexture(textureSize, textureSize, 24);
-
 		irradianceTexture = new RenderTexture(textureSize, textureSize, 24);
+		
 		irradianceTexture.useMipMap = true;
 		irradianceTexture.autoGenerateMips = true;
+		
+		if (applyShadows)
+		{
+			shadowTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.R8);
+			irradiance2Texture = new RenderTexture(textureSize, textureSize, 24);
+			shadowTexture.useMipMap = true;
+			shadowTexture.autoGenerateMips = true;
+			irradiance2Texture.useMipMap = true;
+			irradiance2Texture.autoGenerateMips = true;
+		}
 
 		blur2Texture = new RenderTexture(textureSize, textureSize, 24);
 		blur3Texture = new RenderTexture(textureSize, textureSize, 24);
@@ -120,14 +132,6 @@ public class MipImpl_SkinHelper : MonoBehaviour
 		// blur4StretchTexture = new RenderTexture(textureSize, textureSize, 24);
 		// blur5StretchTexture = new RenderTexture(textureSize, textureSize, 24);
 		// blur6StretchTexture = new RenderTexture(textureSize, textureSize, 24);
-
-		if (applyShadows)
-		{
-			shadowTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.R8);
-			irradiance2Texture = new RenderTexture(textureSize, textureSize, 24);
-			irradiance2Texture.useMipMap = true;
-			irradiance2Texture.autoGenerateMips = true;
-		}
 	}
 
 	/// <summary>
@@ -186,12 +190,14 @@ public class MipImpl_SkinHelper : MonoBehaviour
 			dummyCamera.targetTexture = shadowTexture;
 			dummyCamera.RenderWithShader(shadowMaterial.shader, "");
 			
-			gaussianMaterial.SetFloatArray("_MipBlendWeights", mipBlendWeightsForShadows);
-			gaussianMaterial.SetInt("_MipCount", mipBlendWeightsForShadows.Length);
-			
-			Graphics.Blit(shadowTexture, tempRenderTexture, gaussianMaterial);
+			GaussianBlur(mipBlendWeightsForShadows, shadowTexture, tempRenderTexture);
 			Graphics.Blit(tempRenderTexture, shadowTexture);
-			tempRenderTexture.Release();
+			
+			// gaussianMaterial.SetFloatArray("_MipBlendWeights", mipBlendWeightsForShadows);
+			// gaussianMaterial.SetInt("_MipCount", mipBlendWeightsForShadows.Length);
+			// Graphics.Blit(shadowTexture, tempRenderTexture, gaussianMaterial);
+			// Graphics.Blit(tempRenderTexture, shadowTexture);
+			//tempRenderTexture.Release();
 			
 			// gaussianUMaterial.SetFloat("_GaussianWidth", 1.0f);
 			// gaussianVMaterial.SetFloat("_GaussianWidth", 1.0f);
