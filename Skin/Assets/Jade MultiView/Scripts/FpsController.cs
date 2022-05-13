@@ -7,7 +7,7 @@ public class FpsController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Application.targetFrameRate = 90;
+        Application.targetFrameRate = 200;
     }
 
     // Update is called once per frame

@@ -57,6 +57,7 @@
      <Compile Include="Assets\RE_Translucency\Scripts\FPS.cs" />
      <Compile Include="Assets\RE_Translucency\Scripts\RE_Translucency.cs" />
      <Compile Include="Assets\Skin\Mip Impl\MipImpl_SkinHelper.cs" />
+     <Compile Include="Assets\Skin\Pre-integrate\CreateCurveTex.cs" />
      <Compile Include="Assets\Skin\Scripts\SkinHelper.cs" />
      <Compile Include="Assets\Skin\Scripts\TsmLight.cs" />
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\Cutout Reflective Bumped.shader" />
@@ -101,6 +102,8 @@
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\Cutout Reflective Specular.shader" />
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\Cutout.shader" />
      <None Include="Assets\Jade MultiView\Shaders\ComputeTsm.shader" />
+     <None Include="Assets\Skin\Pre-integrate\Pre_SkinBake.shader" />
+     <None Include="Assets\Skin\Pre-integrate\Pre_Skin_v2.shader" />
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\cginc\SSS.cginc" />
      <None Include="Assets\Skin\Shaders\Skin_GPUGems3-14\ApplyShadowsToIrradiance.shader" />
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\Reflective.shader" />
@@ -108,6 +111,7 @@
      <None Include="Assets\Skin\Shaders\Skin_GPUGems3-14\ComputeIrradiance.shader" />
      <None Include="Assets\Skin\Shaders\Skin_GPUGems3-14\ComputeStretchMaps.shader" />
      <None Include="Assets\Jade MultiView\Shaders\Bilateral Filter.shader" />
+     <None Include="Assets\Skin\Pre-integrate\Pre_Skin.shader" />
      <None Include="Assets\Jade MultiView\Shaders\JadeMultiView.shader" />
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\Reflective Bumped Specular.shader" />
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\Transparent Bumped.shader" />

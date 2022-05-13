@@ -83,6 +83,7 @@ public class MipImpl_SkinHelper : MonoBehaviour
 
 		// 计算各个高斯核的 Mip 混合权重
 		float blurStepScale = skinMaterial.GetFloat("_BlurStepScale");
+		blurStepScale /= 0.4f; // stretch-correction map 对采样步长的影响是：平均乘以0.4
 		blurStepScale *= blurStepScale;
 		mipLevelCount = applyShadows ? irradiance2Texture.mipmapCount : irradianceTexture.mipmapCount;
 		gaussiansMipBlendWeights = new float[gaussionWvNames.Length][];
@@ -191,8 +192,7 @@ public class MipImpl_SkinHelper : MonoBehaviour
 			dummyCamera.RenderWithShader(shadowMaterial.shader, "");
 			
 			GaussianBlur(mipBlendWeightsForShadows, shadowTexture, tempRenderTexture);
-			Graphics.Blit(tempRenderTexture, shadowTexture);
-			
+
 			// gaussianMaterial.SetFloatArray("_MipBlendWeights", mipBlendWeightsForShadows);
 			// gaussianMaterial.SetInt("_MipCount", mipBlendWeightsForShadows.Length);
 			// Graphics.Blit(shadowTexture, tempRenderTexture, gaussianMaterial);
@@ -207,7 +207,7 @@ public class MipImpl_SkinHelper : MonoBehaviour
 			// Graphics.Blit(tempGaussianTexture, shadowTexture, gaussianVMaterial);
 
 			// Apply shadows to irradiance texture
-			applyShadowsMaterial.SetTexture("_ShadowTex", shadowTexture);
+			applyShadowsMaterial.SetTexture("_ShadowTex", tempRenderTexture);
 			applyShadowsMaterial.SetTexture("_DiffuseTex", skinMaterial.GetTexture("_MainTex"));
 			applyShadowsMaterial.SetFloat("_Mix", skinMaterial.GetFloat("_Mix"));
 			Graphics.Blit(irradianceTexture, irradiance2Texture, applyShadowsMaterial);
@@ -250,6 +250,7 @@ public class MipImpl_SkinHelper : MonoBehaviour
 
 		// Compute convolutions. Since the first convolution kernel is very narrow, 
 		// we can use the irradiance texture as the first convolution
+		// GaussianBlur(gaussiansMipBlendWeights[0] , finalIrradianceTexture, finalIrradianceTexture);
 		GaussianBlur(gaussiansMipBlendWeights[1] , finalIrradianceTexture, blur2Texture);
 		GaussianBlur(gaussiansMipBlendWeights[2], finalIrradianceTexture, blur3Texture);
 		GaussianBlur(gaussiansMipBlendWeights[3], finalIrradianceTexture, blur4Texture);
