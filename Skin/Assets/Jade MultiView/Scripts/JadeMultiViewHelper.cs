@@ -9,8 +9,7 @@ public class JadeMultiViewHelper : MonoBehaviour
     public Material depthMaterial;
     public Material tsmMaterial;
     public Material penetrationMaterial;
-    public Material gaussianUMaterial;
-    public Material gaussianVMaterial;
+    public Material BlurPenetrationMaterial;
     public Material BilateralFilterMaterial;
 
     public GameObject tsmLight;
@@ -21,10 +20,8 @@ public class JadeMultiViewHelper : MonoBehaviour
     private RenderTexture topdownDepthTexture;
     private RenderTexture penetrationTexture;
     private RenderTexture penetrationTexture2;
-    // private RenderTexture tempGaussianTexture;
 
     public int textureSize = 512;
-
     public float _ObjectGrowFactor = 0.01f;
     
     void Start()
@@ -32,12 +29,10 @@ public class JadeMultiViewHelper : MonoBehaviour
         tsmTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
         topdownDepthTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.Depth);
         penetrationTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
-        // penetrationTexture.autoGenerateMips = true;
-        // penetrationTexture.useMipMap = true;
+        penetrationTexture.autoGenerateMips = true;
+        penetrationTexture.useMipMap = true;
         penetrationTexture2 = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
-        // tempGaussianTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGBFloat);
 
-        
         InitializeScene();
         
         Shader.SetGlobalTexture("_TsmTex", tsmTexture);
@@ -50,19 +45,11 @@ public class JadeMultiViewHelper : MonoBehaviour
         Matrix4x4 worldToLightMatrix = tsmLightCamera.worldToCameraMatrix;
         Matrix4x4 LightCameraProjMatrix = GL.GetGPUProjectionMatrix(tsmLightCamera.projectionMatrix, true);
         Shader.SetGlobalMatrix("_WorldToLight_VP", LightCameraProjMatrix * worldToLightMatrix);
-        
         Shader.SetGlobalVector("_TsmLightPosWorld", tsmLight.transform.position);
-        
         Shader.SetGlobalFloat("_ObjectGrowFactor", _ObjectGrowFactor);
-        
         Shader.SetGlobalFloat("_TextureSize", textureSize);
 
-        // float blurStepScale = jadeMultiViewMaterial.GetFloat("_BlurStepScale");
-        // gaussianUMaterial.SetFloat("_BlurStepScale", blurStepScale);
-        // gaussianVMaterial.SetFloat("_BlurStepScale", blurStepScale);
-        
-        jadeMultiViewMaterial.SetTexture("_PenetrationTexture", penetrationTexture2);
-        
+        jadeMultiViewMaterial.SetTexture("_PenetrationTexture", penetrationTexture);
     }
     
     void InitializeScene()
@@ -99,26 +86,11 @@ public class JadeMultiViewHelper : MonoBehaviour
         // Penetration
         topdownDepthCamera.targetTexture = penetrationTexture;
         topdownDepthCamera.RenderWithShader(penetrationMaterial.shader, "");
+        Graphics.Blit(penetrationTexture, penetrationTexture2, BlurPenetrationMaterial);
         
         // Bilateral filter
-        Graphics.Blit(penetrationTexture, penetrationTexture2, BilateralFilterMaterial);
-        // Graphics.Blit(penetrationTexture2, penetrationTexture/*, FillBackgroundMaterial*/);
-        
-        // GaussianBlur(0.002f, penetrationTexture2, penetrationTexture);
-
+        Graphics.Blit(penetrationTexture2, penetrationTexture, BilateralFilterMaterial);
     }
-
-    // void GaussianBlur(float variance, RenderTexture source, RenderTexture destination)
-    // {
-    //     // The gaussian width is the standard deviation (square root of the variance)
-    //     float width = Mathf.Sqrt(variance);
-    //     gaussianUMaterial.SetFloat("_GaussianWidth", width);
-    //     gaussianVMaterial.SetFloat("_GaussianWidth", width);
-    //     
-    //     Graphics.Blit(source, tempGaussianTexture, gaussianUMaterial);
-    //     Graphics.Blit(tempGaussianTexture, destination, gaussianVMaterial);
-    // }
-    
 }
 
 

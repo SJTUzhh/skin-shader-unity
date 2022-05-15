@@ -1,29 +1,19 @@
 ﻿Shader "Jade MultiView/JadeMultiView"
 {
 	Properties {
-		_MainTex ("Diffuse", 2D) = "white" {}
-		_DiffuseIntensity( "DiffuseIntensity", Range( 0,1 ) ) = 0
-		//_DiffuseLOD( "DiffuseLOD", Range( 0,16 ) ) = 0
-		_MainColor( "MainColor", Color ) = ( 1,1,1,1 )
+		_Diffuse ("Diffuse", 2D) = "white" {}
+		_DiffuseIntensity( "DiffuseIntensity", Range(0, 1)) = 0
+		_MainColor( "MainColor", Color) = ( 1,1,1,1 )
 		
-		_AmbientCube( "AmbientCube", Cube ) = "white" {}
-		
-		_MinPenetration("Minimum Penetration", float) = 0.01
-		_MaxPenetration( "Maxmum Penetration", float) = 0.9
-		
-		_AmbientMin( "AmbientMin", Range( -1,1) ) = 0.4
-		_AmbientFactor( "AmbientFactor", Range( 0,1 ) ) = 0.5
-		_AmbientLOD( "AmbientLOD", Range( 0,16 ) ) = 4
-		_Reverse( "Reverse", int ) = 0
+		_AmbientCube( "AmbientCube", Cube) = "white" {}
+		_AmbientMin( "AmbientMin", Range( -1, 1)) = 0.4
+		_AmbientFactor( "AmbientFactor", Range( 0, 1)) = 0.5
+		_AmbientLOD( "AmbientLOD", Range( 0, 16)) = 4
 		
 		_PenetrationTestCount ("Penetration Test Count", float) = 16
-		_OpenErrorCorrection ("Open Penetration Error Correction", Range(-1, 1)) = 1
-	
-		// _BlurStepScale ("Gaussian Sample Distance Scale", Range(0.01, 1.0)) = 0.01
 		
 		_PointLightColor("Point Light Color", Color) = ( 1,1,1,1 )
-		_PointLightIntensity("Point Light Intensity", Range(0.0, 5.0)) = 1.0
-		_AirFalloff("Air Falloff Rate Compared to Jade", Range(0.0, 1.0)) = 0.5
+		_PointLightIntensity("Point Light Intensity", Range(0.0, 10.0)) = 1.0
 	}
 	SubShader
 	{
@@ -53,7 +43,7 @@
             
 			uniform sampler2D _NormalTex;
 			uniform samplerCUBE _AmbientCube;
-			uniform sampler2D _MainTex;
+			uniform sampler2D _Diffuse;
 			
 			// uniform float4x4 _LightView;
 			// uniform float4x4 _LightViewProj;
@@ -93,6 +83,7 @@
             uniform float4 _PointLightColor;
             uniform float _PointLightIntensity;
             uniform float _AirFalloff;
+            uniform float _PenetrationMipLevel;
 
 			struct a2v
 			{
@@ -107,7 +98,7 @@
             	float2 uv : TEXCOORD0;
             	float3 normalWorld : TEXCOORD1;
             	float3 eyeDirWorld : TEXCOORD2;
-            	// float3 posWorld : TEXCOORD3;
+            	float3 posWorld : TEXCOORD3;
             };
             
             v2f vert(a2v v)
@@ -117,7 +108,7 @@
             	o.uv = v.uv;
             	o.normalWorld = UnityObjectToWorldNormal(v.normal); // normalized
             	o.eyeDirWorld = normalize(UnityWorldSpaceViewDir(mul(unity_ObjectToWorld, v.vertex).xyz));
-            	// o.posWorld = mul(unity_ObjectToWorld, v.vertex).xyz;
+            	o.posWorld = mul(unity_ObjectToWorld, v.vertex).xyz;
 
             	return o;
             	
@@ -125,37 +116,24 @@
 
             float4 frag(v2f i) : SV_Target
             {
-            	// float travelDist = tex2D(_PenetrationTexture, i.uv).r;
-            	float penetrationWeight = tex2D(_PenetrationTexture, i.uv).r;
             	
-            	// 计算穿透辐照度
-				// float penetrationWeight;
-				// if (travelDist >= _MinDist && travelDist <= _MaxDist)
-				// {
-				// 	penetrationWeight = saturate((travelDist - _MinDist) / (_MaxDist - _MinDist));
-				// }
-				if (_Reverse)
-				{
-					penetrationWeight = 1.0 - penetrationWeight;
-				}
-            	float penetrationExp = penetrationWeight;
-            	// float4 L = normalize(_TsmLightPosWorld - float4(i.posWorld, 1.0));
-            	// float vDotL = max(0, dot(float4(i.eyeDirWorld, 1.0), -L));
-            	// float nDotL = dot(float4(i.normalWorld, 1.0), L);
+            	float penetrationExp = tex2D(_PenetrationTexture, i.uv).r;
+            	float4 L = normalize(_TsmLightPosWorld - float4(i.posWorld, 1.0));
+            	float nDotV = max(0, dot(float4(i.normalWorld, 1.0), float4(i.eyeDirWorld, 1.0)));
+            	// float nDotL = abs(dot(float4(i.normalWorld, 1.0), L));
             	// float outAttenuation = nDotL + vDotL;
             	// return float4(nDotL, 0.0, 0.0, 1.0);
-            	float3 penetrateIrradiance = /* vDotL * penetrationExp * */_PointLightColor  * _PointLightIntensity * 1.0  * (penetrationExp * penetrationExp);
+            	float3 penetrateIrradiance = _PointLightColor  * _PointLightIntensity * 1.0  * (penetrationExp * penetrationExp);
 
-            	float4 DiffuseTex = tex2D(_MainTex, i.uv);
-				// float3 UsedColor = _MainColor;// *( 1.0 - _DiffuseIntensity ) + DiffuseTex * _DiffuseIntensity;// Blend( _MainColor, _MainColor * DiffuseTex, _DiffuseIntensity );// *_MainColor;
-				float3 DiffuseContrib = _MainColor * penetrateIrradiance;// DiffuseTexel;
-				DiffuseContrib += DiffuseTex * _DiffuseIntensity;
+            	float4 DiffuseColor = tex2D(_Diffuse, i.uv);
+            	DiffuseColor = DiffuseColor * _DiffuseIntensity + _MainColor * (1 - _DiffuseIntensity);
+				float3 DiffuseContrib = DiffuseColor * penetrateIrradiance * nDotV;// DiffuseTexel;
+				// DiffuseContrib += DiffuseTex * _DiffuseIntensity;
 	            
 				float3 reflectRay = normalize(reflect(i.normalWorld, -i.eyeDirWorld));
 				float4 ambientColor = texCUBElod(_AmbientCube, float4(reflectRay, _AmbientLOD));
 				float3 finalColor = DiffuseContrib;
 				ambientColor = max(ambientColor, _AmbientMin);
-				// if ( _Reverse == 0)
 				finalColor += ambientColor * _AmbientFactor;
 				return float4(finalColor, _MainColor.a); // DiffuseTexel.a );
             }

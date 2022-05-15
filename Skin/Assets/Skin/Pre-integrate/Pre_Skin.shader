@@ -122,6 +122,7 @@ Shader "Skin/Pre-Integrate_Skin"
 					#else
 						fixed3 worldShapeBump = normalize(i.worldNormal);
 						fixed cuv = saturate(_CurveFactor * 0.01 * (length(fwidth(worldShapeBump)) / length(fwidth(i.worldPos))));
+						//fixed cuv = 0.5;
 					#endif
 				#endif
 
@@ -130,7 +131,7 @@ Shader "Skin/Pre-Integrate_Skin"
 					fixed3 diffuse = max(0,NoL);
 				#else
 					fixed NoL = dot(worldBump, lightDir);	
-					fixed3 diffuse = tex2D(_SSSLUT,float2(NoL*0.5+0.5,cuv));
+					fixed3 diffuse = tex2D(_SSSLUT,float2(NoL*0.5+0.5, cuv));
 				#endif
 
 				half3 h = lightDir + viewDir;

@@ -119,6 +119,7 @@
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\Cutout Reflective Bumped Specular.shader" />
      <None Include="Assets\Skin\Models\3dScanStore-BlenderHead\source.txt" />
      <None Include="Assets\Skin\Shaders\Skin_GPUGems3-14\ComputeBeckmann.shader" />
+     <None Include="Assets\Jade MultiView\Shaders\BlurPenetration.shader" />
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\cginc\Shadow.cginc" />
      <None Include="Assets\Skin\Shaders\Skin_GPUGems3-14\TSM.shader" />
      <None Include="Assets\Amazing Assets\Subsurface Scattering Shader\Shaders\Transparent Specular.shader" />

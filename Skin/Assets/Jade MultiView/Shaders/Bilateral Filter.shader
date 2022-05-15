@@ -38,7 +38,7 @@
 
             #define SIGMA 10.0
 			#define BSIGMA 0.1
-			#define MSIZE 5
+			#define MSIZE 3
 
 			float normpdf(float x, float sigma)
 			{
@@ -88,6 +88,8 @@
             	
 				float bZ = 1.0 / normpdf(0.0, BSIGMA);
 				// read out the texels
+            	if(color.w < 0.5) color.xyz = float3(0.0, 0.0, 0.0);
+            	bool background = true;
 				for (int i = -kSize; i <= kSize; ++i)
 				{
 					for (int j = -kSize; j <= kSize; ++j)
@@ -95,12 +97,13 @@
 						float2 neighbourUv = vs_in.uv + float2(i, j) / _TextureSize;
 						float4 neighbourColor = tex2D(_MainTex, neighbourUv);
 						if(neighbourColor.w < 0.5f) continue;
+						background = false;
 						float weight = normpdf3(neighbourColor.xyz - color.xyz, BSIGMA)*bZ*kernel[kSize+j]*kernel[kSize+i];
 						totalWeight += weight;
 						final += weight * neighbourColor.xyz;
 					}
 				}
-            	
+            	if(background) return float4(0.07, 0.07, 0.07, 1.0);
             	return float4(final / totalWeight, 1.0);
             }
             
