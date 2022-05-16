@@ -88,7 +88,7 @@
             	
 				float bZ = 1.0 / normpdf(0.0, BSIGMA);
 				// read out the texels
-            	if(color.w < 0.5) color.xyz = float3(0.0, 0.0, 0.0);
+            	if(color.w < 0.5) color.xyz = float3(0.9, 0.9, 0.9);
             	bool background = true;
 				for (int i = -kSize; i <= kSize; ++i)
 				{
@@ -103,7 +103,7 @@
 						final += weight * neighbourColor.xyz;
 					}
 				}
-            	if(background) return float4(0.07, 0.07, 0.07, 1.0);
+            	if(background) return float4(0.95, 0.95, 0.95, 1.0);
             	return float4(final / totalWeight, 1.0);
             }
             

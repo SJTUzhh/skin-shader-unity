@@ -120,7 +120,6 @@
             	float penetrationExp = tex2D(_PenetrationTexture, i.uv).r;
             	float4 L = normalize(_TsmLightPosWorld - float4(i.posWorld, 1.0));
             	float nDotV = max(0, dot(float4(i.normalWorld, 1.0), float4(i.eyeDirWorld, 1.0)));
-            	// float nDotL = abs(dot(float4(i.normalWorld, 1.0), L));
             	// float outAttenuation = nDotL + vDotL;
             	// return float4(nDotL, 0.0, 0.0, 1.0);
             	float3 penetrateIrradiance = _PointLightColor  * _PointLightIntensity * 1.0  * (penetrationExp * penetrationExp);

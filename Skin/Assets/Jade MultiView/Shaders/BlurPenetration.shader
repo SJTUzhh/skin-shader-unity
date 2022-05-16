@@ -66,7 +66,7 @@
 				penetrationWeight = 1.0 - penetrationWeight;
 			}
 
-        	penetrationWeight *= tsmNDotL;
+        	// penetrationWeight *= tsmNDotL;
 
         	return float4(penetrationWeight, penetrationWeight, penetrationWeight, 1.0);
         }
